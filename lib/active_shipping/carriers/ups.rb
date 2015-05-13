@@ -591,13 +591,15 @@ module ActiveShipping
           xml.Code('02')
         end
 
-        xml.Dimensions do
-          xml.UnitOfMeasurement do
-            xml.Code(options[:imperial] ? 'IN' : 'CM')
-          end
-          [:length, :width, :height].each do |axis|
-            value = ((options[:imperial] ? package.inches(axis) : package.cm(axis)).to_f * 1000).round / 1000.0 # 3 decimals
-            xml.public_send(axis.to_s.capitalize, [value, 0.1].max)
+        if package.weight(type: :dimensional).to_i > 0
+          xml.Dimensions do
+            xml.UnitOfMeasurement do
+              xml.Code(options[:imperial] ? 'IN' : 'CM')
+            end
+            [:length, :width, :height].each do |axis|
+              value = ((options[:imperial] ? package.inches(axis) : package.cm(axis)).to_f * 1000).round / 1000.0 # 3 decimals
+              xml.public_send(axis.to_s.capitalize, [value, 0.1].max)
+            end
           end
         end
 
